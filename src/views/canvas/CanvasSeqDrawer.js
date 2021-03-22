@@ -25,6 +25,10 @@ const Drawer = {
     return this;
   },
 
+    ////////////////////////////////////////////////////////////////////////////////
+    // ptr a avea randuri care sa tina cont de height variabila a adnotarilor....
+    ////////////////////////////////////////////////////////////////////////////////
+    // Eliza - Modified
   drawSeqs: function(callback, target) {
     const hidden = this.g.columns.get("hidden");
 
@@ -39,7 +43,22 @@ const Drawer = {
       }
       callback.call(target, {model: seq, yPos: y, y: i, hidden: hidden});
 
-      const seqHeight = (seq.attributes.height || 1) * this.rectHeight;
+      // const seqHeight = (seq.attributes.height || 1) * this.rectHeight;
+
+      if (seq.attributes.features.length == 0){
+        var extraheight = 0;
+      }
+      else {
+        var featurescale = seq.attributes.features.models[0].attributes.heightscale;
+        var featureheight = (seq.attributes.height - 1) * featurescale * this.rectHeight;
+
+        // add a 10% gap
+        var extraheight = featureheight + 0.1 * this.rectHeight;
+        
+      }
+
+      var seqHeight = this.rectHeight + extraheight;
+
       y = y + seqHeight;
 
       // out of viewport - stop

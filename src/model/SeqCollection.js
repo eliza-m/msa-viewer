@@ -103,6 +103,66 @@ const SeqCollection = Collection.extend({
     return this._bindSeqsWithFeatures();
   },
 
+
+ ///////////////////////////////////////////////////////////////////////
+ // Add features at custom height, opacity and with hexa color codes
+ // works only with jalview gff format
+ ///////////////////////////////////////////////////////////////////////
+ // Eliza - Added new function
+  // var opts_features = {
+  //   el: document.getElementById("yourDiv"),
+  //   defaults: {
+  //       height: -1,
+  //       // text: "",
+  //       // fillColor: "red",
+  //       fillOpacity: 0.5,
+  //       type: "rectangle",
+  //       borderSize: 1,
+  //       borderColor: "purple",
+  //       borderOpacity: 0.5,
+  // }
+  // };
+  // you can add features independent to the current seqs as they may be added
+  // later (lagging connection)
+  // sequence - feature binding is based on id
+  addCustomFeatures: function(features, heightscale, opacity) {
+    if ((features.config != null)) {
+      const obj = features;
+      features = features.seqs;
+      if ((obj.config.colors != null)) {
+        const colors = obj.config.colors;
+        _.each(features, function(seq) {
+          return _.each(seq, function(val) {
+            if ((colors[val.feature] != null)) {
+              /// HERE
+              /// Doar culori in hexa !!!!
+              return (
+                val.fillOpacity = opacity, 
+                val.heightscale = heightscale, 
+                val.fillColor = "#"+colors[val.feature] );
+            }
+          });
+        });
+      }
+    }
+    // we might already have features
+    if (_.isEmpty(this.features)) {
+      // replace (no existent features)
+      this.features = features;
+    } else {
+      // merge
+      _.each(features, (val, key) => {
+        if (!this.features.hasOwnProperty(key)) {
+          return this.features[key] = val;
+        } else {
+          return this.features[key] = _.union(this.features[key], val);
+        }
+      });
+    }
+    // rehash
+    return this._bindSeqsWithFeatures();
+  },
+
   // adds features to a sequence
   // does it silenty without triggering an event
   _bindSeqWithFeatures: function(seq) {

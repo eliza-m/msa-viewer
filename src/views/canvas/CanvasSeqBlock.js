@@ -134,9 +134,16 @@ const View = boneView.extend({
     }
   },
 
+ ///////////////////////////////////////////////////////////////////////
+ // Draw features at custom height, opacity
+ ///////////////////////////////////////////////////////////////////////
+ // Eliza - modified original function
   drawFeatures: function(data) {
     const rectWidth = this.g.zoomer.get("columnWidth");
     const rectHeight = this.g.zoomer.get("rowHeight");
+
+    /*
+    // Original
     if (data.model.attributes.height > 1) {
       const ctx = this.ctx;
       data.model.attributes.features.each(function(feature) {
@@ -145,6 +152,33 @@ const View = boneView.extend({
         const y = (feature.attributes.row + 1) * rectHeight;
         return ctx.fillRect(feature.attributes.xStart * rectWidth + data.xZero,y + data.yZero,rectWidth * len,rectHeight);
       });
+    */
+
+   if (data.model.attributes.height > 1) {
+    var ctx = this.ctx;
+    
+    console.log(ctx)
+
+    data.model.attributes.features.each(function (feature) {
+
+
+
+      ctx.globalAlpha  = feature.attributes.fillOpacity;
+      ctx.fillStyle = feature.attributes.fillColor;
+
+      var featurescale = feature.attributes.heightscale
+      var featureheight = featurescale * rectHeight;
+
+      var len = feature.attributes.xEnd - feature.attributes.xStart + 1;
+
+      var y = rectHeight + feature.attributes.row * featureheight;
+      
+      // single row !!!
+      // var y = rectHeight;
+
+      return ctx.fillRect(feature.attributes.xStart * rectWidth + data.xZero, y + data.yZero, rectWidth * len, featureheight);
+      
+    });
 
       // draw text
       ctx.fillStyle = "black";
@@ -153,11 +187,27 @@ const View = boneView.extend({
       ctx.textAlign = "center";
 
       return data.model.attributes.features.each(function(feature) {
+
+        //original
+        /*
         const len = feature.attributes.xEnd - feature.attributes.xStart + 1;
         const y = (feature.attributes.row + 1) * rectHeight;
         return ctx.fillText( feature.attributes.text, data.xZero + feature.attributes.xStart *
         rectWidth + (len / 2) * rectWidth, data.yZero + rectHeight * 0.5 + y
-        );
+        */
+
+       var len = feature.attributes.xEnd - feature.attributes.xStart + 1;
+          
+       // var y = (feature.attributes.row + 1 ) * rectHeight;
+       // single row !!!
+       // var y = rectHeight;
+
+       var featurescale = feature.attributes.heightscale
+       var featureheight = featurescale * rectHeight;
+       var y = rectHeight + feature.attributes.row * featureheight;
+       
+       return ctx.fillText(feature.attributes.text, data.xZero + feature.attributes.xStart * rectWidth + len / 2 * rectWidth, data.yZero + featureheight + y);
+    
       });
     }
   },
